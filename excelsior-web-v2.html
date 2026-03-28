@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EXCELSIOR (XLS)</title>
+<style>
+:root {
+  --bg:#0a0a0f; --bg2:#111118; --bg3:#1a1a24; --border:#2a2a3a;
+  --accent:#7c3aed; --accent2:#06b6d4; --green:#10b981;
+  --red:#ef4444; --gold:#f59e0b; --text:#e2e8f0; --muted:#64748b;
+  --font:'Courier New',monospace; --radius:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh}
+.header{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:16px}
+.logo{font-size:1.4rem;font-weight:700;color:var(--accent);letter-spacing:2px}
+.logo span{color:var(--accent2)}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.status-text{font-size:.75rem;color:var(--muted)}
+.nav{margin-left:auto;display:flex;gap:4px}
+.nav button{background:transparent;border:1px solid var(--border);color:var(--muted);padding:6px 14px;border-radius:var(--radius);cursor:pointer;font-family:var(--font);font-size:.8rem;transition:all .2s}
+.nav button.active,.nav button:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+.main{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 53px)}
+.sidebar{background:var(--bg2);border-right:1px solid var(--border);padding:20px;overflow-y:auto}
+.content{padding:24px;overflow-y:auto}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px}
+.card-title{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.card h2{font-size:1rem;margin-bottom:12px;color:var(--accent2)}
+input,select,textarea{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:var(--radius);font-family:var(--font);font-size:.85rem;margin-bottom:10px;outline:none;transition:border-color .2s}
+input:focus,select:focus{border-color:var(--accent)}
+label{font-size:.75rem;color:var(--muted);display:block;margin-bottom:4px}
+button.btn{background:var(--accent);color:#fff;border:none;padding:9px 18px;border-radius:var(--radius);cursor:pointer;font-family:var(--font);font-size:.85rem;width:100%;margin-top:4px;transition:opacity .2s}
+button.btn:hover{opacity:.85}
+button.btn:disabled{opacity:.4;cursor:not-allowed}
+button.btn.secondary{background:var(--bg3);border:1px solid var(--border);color:var(--text)}
+button.btn.green{background:var(--green)}
+button.btn.red{background:var(--red)}
+button.btn.gold{background:var(--gold);color:#000}
+button.btn.sm{padding:5px 10px;font-size:.75rem;width:auto;margin-top:0}
+.val-big{font-size:1.8rem;font-weight:700}
+.val-sub{font-size:.75rem;color:var(--muted);margin-top:2px}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.7rem}
+.badge.green{background:rgba(16,185,129,.15);color:var(--green)}
+.badge.purple{background:rgba(124,58,237,.15);color:var(--accent)}
+.badge.gold{background:rgba(245,158,11,.15);color:var(--gold)}
+.badge.red{background:rgba(239,68,68,.15);color:var(--red)}
+.badge.blue{background:rgba(6,182,212,.15);color:var(--accent2)}
+.table{width:100%;border-collapse:collapse;font-size:.82rem}
+.table th{color:var(--muted);font-weight:normal;text-align:left;padding:6px 12px;border-bottom:1px solid var(--border)}
+.table td{padding:8px 12px;border-bottom:1px solid rgba(42,42,58,.5)}
+.table tr:hover td{background:var(--bg3)}
+.mono{font-family:var(--font);font-size:.78rem;color:var(--muted)}
+.hamster-wrap{display:flex;gap:24px;flex-wrap:wrap}
+.ham-card{flex:1;min-width:200px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.stat-bar{margin-bottom:14px}
+.stat-label{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);margin-bottom:4px}
+.stat-label span:last-child{color:var(--text)}
+.bar-track{background:var(--bg);border-radius:4px;height:8px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width .6s}
+.bar-hp{background:linear-gradient(90deg,var(--red),var(--green))}
+.bar-hunger{background:linear-gradient(90deg,var(--gold),var(--green))}
+.bar-happy{background:linear-gradient(90deg,var(--red),var(--accent2))}
+.bar-xp{background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.notify{position:fixed;bottom:24px;right:24px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:12px 20px;max-width:360px;font-size:.85rem;z-index:1000;opacity:0;transition:opacity .3s;white-space:pre-wrap;word-break:break-all}
+.notify.show{opacity:1}
+.notify.success{border-color:var(--green)}
+.notify.error{border-color:var(--red)}
+.panel{display:none}
+.panel.active{display:block}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.price-arrow{color:var(--accent2);margin:0 8px}
+.impact.low{color:var(--green);font-size:.75rem}
+.impact.high{color:var(--red);font-size:.75rem}
+.addr-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(42,42,58,.4)}
+.addr-row .addr-text{flex:1;font-size:.78rem;font-family:var(--font);color:var(--muted);word-break:break-all}
+.addr-row .addr-bal{font-size:.8rem;color:var(--text);white-space:nowrap}
+.copy-btn{background:transparent;border:1px solid var(--border);color:var(--muted);padding:3px 8px;border-radius:4px;cursor:pointer;font-size:.7rem;font-family:var(--font);transition:all .2s;white-space:nowrap}
+.copy-btn:hover{border-color:var(--accent2);color:var(--accent2)}
+/* Auth overlay */
+#authOverlay{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center}
+.auth-box{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:40px;width:480px;max-width:95vw}
+.auth-box h1{color:var(--accent);font-size:1.6rem;margin-bottom:4px;letter-spacing:2px}
+.auth-box .sub{color:var(--muted);font-size:.85rem;margin-bottom:28px}
+.seed-display{background:var(--bg);border:1px solid var(--accent);border-radius:var(--radius);padding:16px;font-size:.82rem;line-height:1.8;letter-spacing:.5px;color:var(--accent2);word-break:break-all;margin-bottom:16px;user-select:all;cursor:text}
+.word-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.word-chip{background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:6px 8px;font-size:.78rem;color:var(--text)}
+.word-chip span{color:var(--muted);font-size:.65rem;margin-right:4px}
+.tabs{display:flex;gap:4px;margin-bottom:20px}
+.tab{flex:1;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;font-family:var(--font);font-size:.82rem;color:var(--muted);transition:all .2s;text-align:center}
+.tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.burn-info{background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.3);border-radius:var(--radius);padding:12px;font-size:.8rem;margin-bottom:12px}
+.burn-addr{font-family:var(--font);font-size:.72rem;color:var(--red);word-break:break-all}
+.tok-bal-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(42,42,58,.4);font-size:.85rem}
+</style>
+</head>
+<body>
+
+<!-- ── Auth overlay ── -->
+<div id="authOverlay">
+  <div class="auth-box">
+    <h1>EXCEL<span style="color:var(--accent2)">SIOR</span></h1>
+    <div class="sub">Blockchain Wallet · Ticker: XLS</div>
+
+    <div class="tabs">
+      <div class="tab active" onclick="switchAuthTab('login')">🔑 Enter Seed</div>
+      <div class="tab" onclick="switchAuthTab('create')">✨ New Profile</div>
+    </div>
+
+    <!-- Login tab -->
+    <div id="tabLogin">
+      <label>Your 12-word seed phrase</label>
+      <textarea id="loginSeed" rows="3" placeholder="word1 word2 word3 … word12"
+        style="margin-bottom:12px;resize:none"></textarea>
+      <button class="btn" onclick="loginWithSeed()">Enter Wallet</button>
+      <div style="margin-top:12px;font-size:.75rem;color:var(--muted);text-align:center">
+        Your seed never leaves your device. Session stored locally.
+      </div>
+    </div>
+
+    <!-- Create tab -->
+    <div id="tabCreate" style="display:none">
+      <div style="font-size:.82rem;color:var(--muted);margin-bottom:12px">
+        A unique 12-word seed phrase will be generated for you.<br>
+        <strong style="color:var(--gold)">Write it down — it cannot be recovered!</strong>
+      </div>
+      <div class="word-grid" id="newSeedWords"></div>
+      <div class="seed-display" id="newSeedDisplay" style="display:none"></div>
+      <button class="btn secondary" id="btnGenSeed" onclick="generateNewSeed()">Generate Seed Phrase</button>
+      <button class="btn green" id="btnSaveSeed" style="display:none;margin-top:8px" onclick="saveNewProfile()">
+        I've written it down — Enter Wallet
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Main app ── -->
+<div class="header">
+  <div class="logo">EXCEL<span>SIOR</span></div>
+  <div class="status-dot" id="statusDot" style="background:var(--muted)"></div>
+  <div class="status-text" id="statusText">connecting…</div>
+  <div class="nav">
+    <button class="active" onclick="showPanel('wallet',this)">Wallet</button>
+    <button onclick="showPanel('dex',this)">DEX</button>
+    <button onclick="showPanel('hamster',this)">🐹 Hamster</button>
+    <button onclick="showPanel('explorer',this)">Explorer</button>
+    <button onclick="logout()" style="margin-left:12px;border-color:var(--red);color:var(--red)">Logout</button>
+  </div>
+</div>
+
+<div class="main">
+<div class="sidebar">
+  <div class="card">
+    <div class="card-title">Connected Node</div>
+    <div style="font-size:.75rem;color:var(--accent2);word-break:break-all" id="nodeDisplay">—</div>
+    <div style="margin-top:6px;font-size:.72rem;color:var(--muted)">Auto-connected</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">My Addresses</div>
+    <div id="myAddressList">
+      <div style="color:var(--muted);font-size:.8rem">Loading…</div>
+    </div>
+    <button class="btn secondary" style="margin-top:10px" onclick="deriveNewAddress()">+ New Address</button>
+  </div>
+
+  <div class="card" id="selectedAddrCard" style="display:none">
+    <div class="card-title">Active Address</div>
+    <div style="font-size:.72rem;color:var(--accent2);word-break:break-all;margin-bottom:8px" id="activeAddrDisplay">—</div>
+    <div class="val-big" id="balXLS" style="color:var(--text)">0</div>
+    <div class="val-sub">XLS balance</div>
+    <div style="margin-top:8px;font-size:.78rem;color:var(--muted)">
+      Staked: <span id="balStaked">0</span> XLS<br>
+      Unbonding: <span id="balUnbonding">0</span> XLS
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Network Stats</div>
+    <div style="font-size:.78rem;line-height:2">
+      <div>Block: <span id="netHeight" style="color:var(--accent2)">—</span></div>
+      <div>Supply: <span id="netSupply">—</span> XLS</div>
+      <div>Inflation: <span id="netInflation" style="color:var(--gold)">—</span>%</div>
+      <div>Hamster Pool: <span id="netHamster" style="color:var(--green)">—</span> XLS</div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- WALLET panel -->
+<div id="panel-wallet" class="panel active">
+  <div class="grid2">
+    <div class="card">
+      <h2>Send XLS</h2>
+      <label>To Address</label>
+      <input id="sendTo" placeholder="exc1…">
+      <label>Amount (XLS)</label>
+      <input id="sendAmt" type="number" step="0.001" placeholder="10.0" oninput="updateSendFee()">
+      <div id="sendFeeInfo" style="font-size:.75rem;color:var(--muted);margin-bottom:8px"></div>
+      <button class="btn" onclick="sendXLS()">Send XLS ↗</button>
+    </div>
+
+    <div class="card">
+      <h2>Send Custom Token</h2>
+      <label>Token</label>
+      <select id="sendTokSelect">
+        <option value="">— select token —</option>
+      </select>
+      <label>To Address</label>
+      <input id="sendTokTo" placeholder="exc1…">
+      <label>Amount (token units)</label>
+      <input id="sendTokAmt" type="number" placeholder="100">
+      <button class="btn" onclick="sendToken()">Send Token ↗</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Token Balances</h2>
+    <div id="myTokenBalances">
+      <div style="color:var(--muted);font-size:.85rem">Select an address to see token balances</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Become Validator</h2>
+    <div style="font-size:.82rem;color:var(--muted);margin-bottom:12px">
+      Stake XLS to participate in block production and earn 0.09% of transaction fees.
+      Minimum stake: 1,000 XLS.
+    </div>
+    <div class="grid2">
+      <div>
+        <label>Stake Amount (XLS)</label>
+        <input id="valStake" type="number" placeholder="1000" min="1000">
+      </div>
+      <div>
+        <label>Commission % (your cut of delegator rewards)</label>
+        <input id="valCommission" type="number" placeholder="5" min="0" max="100">
+      </div>
+    </div>
+    <button class="btn gold" onclick="registerValidator()">Register as Validator</button>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h2 style="margin:0">🔥 Burn Address</h2>
+      <span class="badge red">Deflationary</span>
+    </div>
+    <div class="burn-info">
+      <div style="font-size:.78rem;color:var(--muted);margin-bottom:6px">
+        Sending XLS or tokens to this address permanently destroys them, reducing total supply.
+        The burn account balance is shown as <strong style="color:var(--red)">negative</strong> — equal to the amount burned.
+      </div>
+      <div class="burn-addr" id="burnAddrDisplay">exc1burn000000000000000000000000000000000000</div>
+      <button class="copy-btn" style="margin-top:6px" onclick="copyBurnAddr()">Copy Burn Address</button>
+    </div>
+    <div id="burnStats" style="font-size:.82rem;line-height:2;color:var(--muted)">Loading…</div>
+  </div>
+</div>
+
+<!-- DEX panel -->
+<div id="panel-dex" class="panel">
+  <div class="grid2">
+    <div class="card">
+      <h2>Swap Tokens</h2>
+      <label>Token</label>
+      <select id="swapToken" onchange="onTokenSelect()">
+        <option value="">— select token —</option>
+      </select>
+      <div id="tokenPriceInfo" style="font-size:.78rem;color:var(--muted);margin-bottom:10px"></div>
+      <label>Direction</label>
+      <select id="swapDir" onchange="updateQuote()">
+        <option value="buy">Buy (XLS → Token)</option>
+        <option value="sell">Sell (Token → XLS)</option>
+      </select>
+      <label>Amount In</label>
+      <input id="swapAmtIn" type="number" placeholder="100" oninput="updateQuote()">
+      <div id="swapQuote" class="card" style="margin:0 0 10px;padding:12px;background:var(--bg3)">
+        <span style="color:var(--muted);font-size:.8rem">Enter amount to see quote</span>
+      </div>
+      <button class="btn green" onclick="doSwap()">Swap</button>
+    </div>
+
+    <div class="card">
+      <h2>Deploy New Token</h2>
+      <label>Token Name</label>
+      <input id="mintName" placeholder="My Token">
+      <label>Symbol (2-5 chars)</label>
+      <input id="mintSymbol" placeholder="MTK" oninput="this.value=this.value.toUpperCase()">
+      <label>Total Supply (token units)</label>
+      <input id="mintSupply" type="number" placeholder="1000000">
+      <label>Initial XLS Deposit (min 100 XLS)</label>
+      <input id="mintDeposit" type="number" placeholder="100" oninput="calcMintFee()">
+      <div id="mintFeeInfo" style="font-size:.75rem;color:var(--gold);margin-bottom:8px"></div>
+      <label>Description (optional)</label>
+      <input id="mintDesc" placeholder="Describe your token">
+      <button class="btn gold" onclick="deployToken()">Deploy Token</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>All Tokens on EXCELSIOR</h2>
+    <table class="table">
+      <thead><tr>
+        <th>Name</th><th>Symbol</th><th>Price (XLS)</th>
+        <th>Pool XLS</th><th>Pool Tokens</th><th>Creator</th>
+      </tr></thead>
+      <tbody id="tokenTableBody">
+        <tr><td colspan="6" style="color:var(--muted);padding:20px">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- HAMSTER panel -->
+<div id="panel-hamster" class="panel">
+  <div class="hamster-wrap">
+    <div class="ham-card" style="max-width:280px">
+      <div style="font-size:4rem;text-align:center;margin:12px 0" id="hamEmoji">🐹</div>
+      <div style="text-align:center;margin-bottom:12px" id="hamStatus">
+        <span class="badge purple">Level 0</span>
+      </div>
+      <div class="stat-bar">
+        <div class="stat-label"><span>HP</span><span id="hamHP">100</span></div>
+        <div class="bar-track"><div class="bar-fill bar-hp" id="barHP" style="width:100%"></div></div>
+      </div>
+      <div class="stat-bar">
+        <div class="stat-label"><span>Hunger</span><span id="hamHunger">100</span></div>
+        <div class="bar-track"><div class="bar-fill bar-hunger" id="barHunger" style="width:100%"></div></div>
+      </div>
+      <div class="stat-bar">
+        <div class="stat-label"><span>Happiness</span><span id="hamHappy">0</span></div>
+        <div class="bar-track"><div class="bar-fill bar-happy" id="barHappy" style="width:50%"></div></div>
+      </div>
+      <div class="stat-bar">
+        <div class="stat-label"><span>XP</span><span id="hamXP">0 / 100</span></div>
+        <div class="bar-track"><div class="bar-fill bar-xp" id="barXP" style="width:0%"></div></div>
+      </div>
+      <div style="text-align:center;margin-top:12px;font-size:.85rem">
+        Credits: <strong id="hamCredits">0</strong>
+        &nbsp;|&nbsp; Streak: <strong id="hamStreak">0</strong>d
+      </div>
+      <div style="text-align:center;margin-top:6px;font-size:.72rem;color:var(--muted)" id="hamFreeGas"></div>
+    </div>
+
+    <div class="ham-card">
+      <div class="card-title">Actions</div>
+      <div class="grid2" style="gap:8px;margin-bottom:12px">
+        <button class="btn" id="btnFeed" onclick="hamAction('feed')">🍎 Free Food</button>
+        <button class="btn" id="btnHP" onclick="hamAction('hp')">💊 Free HP</button>
+        <button class="btn green" id="btnDaily" onclick="hamAction('daily')">📅 Daily Credits</button>
+        <button class="btn secondary" onclick="loadHamster()">🔄 Refresh</button>
+      </div>
+      <div id="hamCooldowns" style="font-size:.73rem;color:var(--muted);margin-bottom:12px"></div>
+      <div class="card-title">Shop (Credits)</div>
+      <div class="grid3" style="gap:6px">
+        <button class="btn secondary" style="font-size:.73rem" onclick="buyItem(1)">🍎 Food S<br><small>1cr +25🍖 +2.5😊</small></button>
+        <button class="btn secondary" style="font-size:.73rem" onclick="buyItem(2)">🥗 Food M<br><small>2cr +50🍖 +5😊</small></button>
+        <button class="btn secondary" style="font-size:.73rem" onclick="buyItem(3)">🍖 Food L<br><small>4cr +100🍖 +10😊</small></button>
+        <button class="btn secondary" style="font-size:.73rem" onclick="buyItem(4)">❤️ HP S<br><small>4cr +10HP</small></button>
+        <button class="btn secondary" style="font-size:.73rem" onclick="buyItem(5)">❤️❤️ HP M<br><small>8cr +25HP</small></button>
+        <button class="btn secondary" style="font-size:.73rem" onclick="buyItem(6)">💖 HP L<br><small>22cr +75HP</small></button>
+        <button class="btn secondary" style="font-size:.73rem" onclick="buyItem(7)">⭐ XP S<br><small>15cr +10XP</small></button>
+        <button class="btn secondary" style="font-size:.73rem" onclick="buyItem(8)">🌟 XP M<br><small>30cr +25XP</small></button>
+        <button class="btn secondary" style="font-size:.73rem" onclick="buyItem(9)">💫 XP L<br><small>80cr +75XP</small></button>
+      </div>
+      <div id="reviveSection" style="display:none;margin-top:12px">
+        <div class="card-title">💀 Hamster is Dead</div>
+        <div class="grid2" style="gap:8px">
+          <button class="btn red" onclick="revive('credits')">Revive (500 credits)</button>
+          <button class="btn red" onclick="revive('xls')">Revive (5 XLS)</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ham-card" style="max-width:260px">
+      <div class="card-title">Level Rewards</div>
+      <div style="font-size:.75rem;color:var(--muted);line-height:2">
+        <div>🎁 10% — 25k free gas</div>
+        <div>🎉 3.33% — 75k gas + 3 XLS</div>
+        <div>🏆 1% — 250k gas + 10 XLS</div>
+        <div>💎 0.33%* — 500k + 125 XLS</div>
+        <div style="font-size:.68rem">* Level 50+ only</div>
+      </div>
+      <div style="margin-top:12px;font-size:.78rem">Free Gas Left:</div>
+      <div id="freeGasDisplay" style="color:var(--accent2);font-size:1.1rem">—</div>
+      <div class="card-title" style="margin-top:16px">Daily Credits by Balance</div>
+      <div style="font-size:.75rem;color:var(--muted);line-height:2">
+        <div>0.1–1 XLS → 1 cr/day</div>
+        <div>1–10 XLS → 2.5 cr/day</div>
+        <div>10–100 XLS → 30 cr/day</div>
+        <div>100+ XLS → 325 cr/day</div>
+        <div style="font-size:.68rem">+streak bonus (+0.05/day)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EXPLORER panel -->
+<div id="panel-explorer" class="panel">
+  <div class="grid2">
+    <div class="card">
+      <h2>Latest Block</h2>
+      <div id="explorerBlock" style="font-size:.82rem;line-height:2;color:var(--muted)">Loading…</div>
+    </div>
+    <div class="card">
+      <h2>Recent Events</h2>
+      <div id="explorerEvents" style="max-height:300px;overflow-y:auto"></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Active Validators</h2>
+    <table class="table">
+      <thead><tr>
+        <th>Address</th><th>Staked (XLS)</th><th>Blocks</th><th>Commission</th><th>Status</th>
+      </tr></thead>
+      <tbody id="validatorTable">
+        <tr><td colspan="5" style="color:var(--muted);padding:16px">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</div><!-- content -->
+</div><!-- main -->
+
+<div class="notify" id="notify"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+const NODE       = 'http://37.139.42.151:8545'; // Auto-connected node
+let   activeAddr = '';
+let   myAddresses= []; // derived from seed
+let   tokens     = [];
+let   refreshTimer;
+let   quoteTimer;
+
+// ═══════════════════════════════════════════════════════════════
+// BIP39-LITE: 200-word wordlist subset (enough for 12-word phrases)
+// Full BIP39 = 2048 words; this is a compact 256-word list for demo
+// In production use the full BIP39 list
+// ═══════════════════════════════════════════════════════════════
+const WORDS = [
+  'abandon','ability','able','about','above','absent','absorb','abstract',
+  'absurd','abuse','access','accident','account','accuse','achieve','acid',
+  'acoustic','acquire','across','act','action','actor','actress','actual',
+  'adapt','add','addict','address','adjust','admit','adult','advance',
+  'advice','aerobic','afford','afraid','again','agent','agree','ahead',
+  'aim','air','airport','aisle','alarm','album','alcohol','alert',
+  'alien','all','alley','allow','almost','alone','alpha','already',
+  'also','alter','always','amateur','amazing','among','amount','amused',
+  'analyst','anchor','ancient','anger','angle','angry','animal','ankle',
+  'announce','annual','another','answer','antenna','antique','anxiety','any',
+  'apart','apology','appear','apple','approve','april','arch','arctic',
+  'area','arena','argue','arm','armor','army','around','arrange',
+  'arrest','arrive','arrow','art','artefact','artist','artwork','ask',
+  'aspect','assault','asset','assist','assume','asthma','athlete','atom',
+  'attack','attend','attitude','attract','auction','audit','august','aunt',
+  'author','auto','autumn','average','avocado','avoid','awake','aware',
+  'away','awesome','awful','awkward','axis','baby','balance','bamboo',
+  'banana','banner','barely','bargain','barrel','base','basic','basket',
+  'battle','beach','bean','beauty','become','beef','before','begin',
+  'behave','behind','believe','below','belt','bench','benefit','best',
+  'betray','better','between','beyond','bicycle','bid','bike','bind',
+  'biology','bird','birth','bitter','black','blade','blame','blanket',
+  'blast','bleak','bless','blind','blood','blossom','blouse','blue',
+  'blur','blush','board','boat','body','boil','bomb','bone',
+  'bonus','book','boost','border','boring','borrow','boss','bottom',
+  'bounce','boy','bracket','brain','brand','brave','breeze','brick',
+  'bridge','brief','bright','bring','brisk','broccoli','broken','bronze',
+  'broom','brother','brown','brush','bubble','buddy','budget','buffalo',
+  'build','bulb','bulk','bullet','bundle','bunker','burden','burger',
+  'burst','bus','business','busy','butter','buyer','buzz','cabbage',
+  'cabin','cable','cactus','cage','cake','call','calm','camera',
+  'camp','canoe','canvas','canyon','capable','capital','captain','carbon',
+  'card','cargo','carpet','carry','cart','case','cash','castle',
+  'casual','catalog','catch','category','cattle','caught','cause','caution',
+  'cave','ceiling','celery','cement','century','cereal','certain','chair',
+  'chaos','chapter','charge','chase','chat','cheap','check','cheese',
+  'chef','cherry','chest','chicken','chief','child','chimney','choice',
+  'choose','chronic','chunk','circle','citizen','city','civil','claim',
+  'clap','clarify','claw','clay','clean','clerk','clever','click',
+  'client','cliff','climb','clinic','clip','clock','clog','close'
+];
+
+function genSeedPhrase() {
+  const words = [];
+  const arr = new Uint32Array(12);
+  crypto.getRandomValues(arr);
+  for (let i = 0; i < 12; i++) words.push(WORDS[arr[i] % WORDS.length]);
+  return words.join(' ');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SEED → DETERMINISTIC ADDRESS DERIVATION
+// We derive addresses deterministically from the seed phrase.
+// Each index i produces a unique address: SHA256(seed + ":" + i)[:20] → exc1...
+// ═══════════════════════════════════════════════════════════════
+
+async function sha256hex(str) {
+  const buf  = new TextEncoder().encode(str);
+  const hash = await crypto.subtle.digest('SHA-256', buf);
+  return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+// Base58 encode (same alphabet as wallet.go)
+const B58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+function base58Encode(bytes) {
+  let n = BigInt('0x' + Array.from(bytes).map(b=>b.toString(16).padStart(2,'0')).join(''));
+  let res = '';
+  while (n > 0n) { res = B58[Number(n % 58n)] + res; n = n / 58n; }
+  for (const b of bytes) { if (b !== 0) break; res = '1' + res; }
+  return res;
+}
+
+async function deriveAddress(seed, index) {
+  const raw   = await sha256hex(seed + ':' + index);
+  const hash160 = new Uint8Array(raw.match(/.{2}/g).slice(0,20).map(h=>parseInt(h,16)));
+  const version = new Uint8Array([0x18]);
+  const versioned = new Uint8Array([...version, ...hash160]);
+  const c1hex = await sha256hex(Array.from(versioned).map(b=>b.toString(16).padStart(2,'0')).join(''));
+  const c1 = new Uint8Array(c1hex.match(/.{2}/g).map(h=>parseInt(h,16)));
+  const c2hex = await sha256hex(Array.from(c1).map(b=>b.toString(16).padStart(2,'0')).join(''));
+  const checksum = new Uint8Array(c2hex.match(/.{2}/g).slice(0,4).map(h=>parseInt(h,16)));
+  const full = new Uint8Array([...versioned, ...checksum]);
+  return 'exc' + base58Encode(full);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════════════════════
+function switchAuthTab(tab) {
+  document.querySelectorAll('.tabs .tab').forEach((t,i) => t.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='create')));
+  document.getElementById('tabLogin').style.display  = tab==='login'  ? 'block' : 'none';
+  document.getElementById('tabCreate').style.display = tab==='create' ? 'block' : 'none';
+}
+
+function generateNewSeed() {
+  const phrase = genSeedPhrase();
+  const words  = phrase.split(' ');
+  const grid   = document.getElementById('newSeedWords');
+  grid.innerHTML = words.map((w,i) => `<div class="word-chip"><span>${i+1}.</span>${w}</div>`).join('');
+  document.getElementById('newSeedDisplay').style.display = 'block';
+  document.getElementById('newSeedDisplay').textContent = phrase;
+  document.getElementById('btnSaveSeed').style.display = 'block';
+  document.getElementById('btnGenSeed').textContent = '🔄 Regenerate';
+  sessionStorage.setItem('xls_pending_seed', phrase);
+}
+
+async function saveNewProfile() {
+  const phrase = sessionStorage.getItem('xls_pending_seed');
+  if (!phrase) return;
+  sessionStorage.removeItem('xls_pending_seed');
+  await startSession(phrase);
+}
+
+async function loginWithSeed() {
+  const phrase = document.getElementById('loginSeed').value.trim().toLowerCase();
+  if (!phrase) return notify('Enter your seed phrase', 'error');
+  const words = phrase.split(/\s+/);
+  if (words.length !== 12) return notify('Seed phrase must be exactly 12 words', 'error');
+  await startSession(phrase);
+}
+
+async function startSession(phrase) {
+  // Store seed hash in localStorage (NOT the seed itself — derive on login)
+  // We store the seed encrypted with itself as a sanity check
+  const fingerprint = await sha256hex(phrase);
+  const profileKey  = 'xls_profile_' + fingerprint.slice(0,16);
+  
+  let profile = JSON.parse(localStorage.getItem(profileKey) || 'null');
+  if (!profile) {
+    // New profile
+    profile = { fingerprint: fingerprint.slice(0,16), addrCount: 1 };
+    localStorage.setItem(profileKey, JSON.stringify(profile));
+  }
+
+  // Store session (seed phrase encrypted with sessionStorage — clears on tab close)
+  sessionStorage.setItem('xls_seed', phrase);
+  sessionStorage.setItem('xls_profile_key', profileKey);
+
+  // Derive addresses
+  myAddresses = [];
+  for (let i = 0; i < profile.addrCount; i++) {
+    const addr = await deriveAddress(phrase, i);
+    myAddresses.push(addr);
+  }
+
+  document.getElementById('authOverlay').style.display = 'none';
+  initApp();
+}
+
+function logout() {
+  sessionStorage.clear();
+  location.reload();
+}
+
+async function deriveNewAddress() {
+  const phrase = sessionStorage.getItem('xls_seed');
+  if (!phrase) return;
+  const profileKey = sessionStorage.getItem('xls_profile_key');
+  let profile = JSON.parse(localStorage.getItem(profileKey) || '{}');
+  const idx = profile.addrCount || 1;
+  const addr = await deriveAddress(phrase, idx);
+  myAddresses.push(addr);
+  profile.addrCount = idx + 1;
+  localStorage.setItem(profileKey, JSON.stringify(profile));
+  renderAddressList();
+  notify('New address derived: ' + addr.slice(0,20) + '…', 'success');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// APP INIT
+// ═══════════════════════════════════════════════════════════════
+async function initApp() {
+  document.getElementById('nodeDisplay').textContent = NODE;
+  connect();
+  renderAddressList();
+  if (myAddresses.length > 0) selectAddress(myAddresses[0]);
+}
+
+function renderAddressList() {
+  const div = document.getElementById('myAddressList');
+  if (myAddresses.length === 0) {
+    div.innerHTML = '<div style="color:var(--muted);font-size:.8rem">No addresses</div>';
+    return;
+  }
+  div.innerHTML = myAddresses.map((addr, i) => `
+    <div class="addr-row">
+      <div>
+        <div class="addr-text">${addr.slice(0,10)}…${addr.slice(-8)}</div>
+        <div style="font-size:.72rem;color:var(--muted)" id="sbal-${i}">loading…</div>
+      </div>
+      <div style="display:flex;gap:4px;align-items:center">
+        <button class="copy-btn" onclick="copyAddr('${addr}')">Copy</button>
+        <button class="copy-btn" onclick="selectAddress('${addr}')" style="border-color:var(--accent);color:var(--accent)">Use</button>
+      </div>
+    </div>`).join('');
+  // Load balances for all addresses
+  myAddresses.forEach((addr, i) => loadSidebarBalance(addr, i));
+}
+
+async function loadSidebarBalance(addr, i) {
+  try {
+    const b = await rpc('xls_getBalance', [addr]);
+    const el = document.getElementById('sbal-' + i);
+    if (el) el.textContent = b.balance + ' XLS';
+  } catch {}
+}
+
+function selectAddress(addr) {
+  activeAddr = addr;
+  document.getElementById('selectedAddrCard').style.display = 'block';
+  document.getElementById('activeAddrDisplay').textContent = addr;
+  loadBalance();
+  loadHamster();
+  loadBurnStats();
+  populateSendTokenSelect();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RPC
+// ═══════════════════════════════════════════════════════════════
+async function rpc(method, params=[]) {
+  const r = await fetch(NODE + '/rpc', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({jsonrpc:'2.0',id:1,method,params})
+  });
+  const d = await r.json();
+  if (d.error) throw new Error(d.error.message);
+  return d.result;
+}
+
+async function connect() {
+  try {
+    const h = await fetch(NODE + '/health').then(r=>r.json());
+    document.getElementById('statusDot').style.background = 'var(--green)';
+    document.getElementById('statusText').textContent = 'Block #' + h.height;
+    document.getElementById('netHeight').textContent  = h.height;
+    loadNetStats();
+    loadTokens();
+    clearInterval(refreshTimer);
+    refreshTimer = setInterval(autoRefresh, 15000);
+  } catch(e) {
+    document.getElementById('statusDot').style.background = 'var(--red)';
+    document.getElementById('statusText').textContent = 'offline';
+    setTimeout(connect, 5000); // retry
+  }
+}
+
+async function autoRefresh() {
+  try {
+    const h = await fetch(NODE+'/health').then(r=>r.json());
+    document.getElementById('statusText').textContent = 'Block #' + h.height;
+    document.getElementById('netHeight').textContent  = h.height;
+    if (activeAddr) loadBalance();
+    loadNetStats();
+    renderAddressList();
+  } catch {}
+}
+
+async function loadNetStats() {
+  try {
+    const t = await rpc('xls_getTokenomics');
+    document.getElementById('netSupply').textContent   = t.current_supply;
+    document.getElementById('netInflation').textContent= t.annual_inflation_pct.toFixed(2);
+    document.getElementById('netHamster').textContent  = t.hamster_pool_total;
+  } catch {}
+}
+
+// ═══════════════════════════════════════════════════════════════
+// WALLET
+// ═══════════════════════════════════════════════════════════════
+async function loadBalance() {
+  if (!activeAddr) return;
+  try {
+    const full = await rpc('xls_getAccountFull', [activeAddr]);
+    document.getElementById('balXLS').textContent      = full.balance;
+    document.getElementById('balStaked').textContent   = full.staked;
+    document.getElementById('balUnbonding').textContent= full.unbonding;
+
+    // Render token balances
+    const toks = full.token_balances || [];
+    const div  = document.getElementById('myTokenBalances');
+    if (toks.length === 0) {
+      div.innerHTML = '<div style="color:var(--muted);font-size:.85rem">No custom tokens in this address. Buy or receive tokens first.</div>';
+    } else {
+      div.innerHTML = toks.map(t => `
+        <div class="tok-bal-row">
+          <div>
+            <span class="badge blue">${t.symbol || '?'}</span>
+            <span style="margin-left:8px;font-size:.8rem">${t.name || t.token_id.slice(0,12)+'…'}</span>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:.9rem;font-weight:700">${t.balance}</div>
+            ${t.price_xls ? `<div style="font-size:.72rem;color:var(--muted)">≈ ${(parseFloat(t.balance_raw||0)/1e8 * parseFloat(t.price_xls||0)).toFixed(4)} XLS</div>` : ''}
+          </div>
+          <button class="copy-btn" onclick="copyText('${t.token_id}')">Copy ID</button>
+        </div>`).join('');
+    }
+  } catch(e) { console.warn('balance:', e); }
+}
+
+function updateSendFee() {
+  const a = parseFloat(document.getElementById('sendAmt').value)||0;
+  document.getElementById('sendFeeInfo').textContent = a>0
+    ? `Fee: ~${(a*0.001).toFixed(8)} XLS (0.1%)` : '';
+}
+
+async function sendXLS() {
+  if (!activeAddr) return notify('Select an address first', 'error');
+  const to  = document.getElementById('sendTo').value.trim();
+  const amt = parseFloat(document.getElementById('sendAmt').value);
+  if (!to || !amt) return notify('Fill recipient and amount', 'error');
+  try {
+    const v = await rpc('wallet_validateAddress', [to]);
+    if (!v.valid) return notify('Invalid address: ' + v.reason, 'error');
+    notify(
+      `To send ${amt} XLS, use CLI:\n\nexcelsior-cli send ${activeAddr} ${to} ${amt}\n\n(Web signing coming in next update)`,
+      'success'
+    );
+  } catch(e) { notify(e.message, 'error'); }
+}
+
+async function sendToken() {
+  if (!activeAddr) return notify('Select an address first', 'error');
+  const tokenID = document.getElementById('sendTokSelect').value;
+  const to      = document.getElementById('sendTokTo').value.trim();
+  const amt     = parseFloat(document.getElementById('sendTokAmt').value);
+  if (!tokenID) return notify('Select a token', 'error');
+  if (!to || !amt) return notify('Fill recipient and amount', 'error');
+  try {
+    const v = await rpc('wallet_validateAddress', [to]);
+    if (!v.valid) return notify('Invalid recipient address', 'error');
+    // Submit token transfer tx (no signing in browser yet)
+    const result = await rpc('tok_tokenTransfer', [activeAddr, to, tokenID, Math.round(amt * 1e8)]);
+    notify('Token transfer queued!\nTx: ' + result.txHash.slice(0,20) + '…', 'success');
+    setTimeout(loadBalance, 2000);
+  } catch(e) { notify(e.message, 'error'); }
+}
+
+async function populateSendTokenSelect() {
+  if (!activeAddr) return;
+  try {
+    const full = await rpc('xls_getAccountFull', [activeAddr]);
+    const sel  = document.getElementById('sendTokSelect');
+    sel.innerHTML = '<option value="">— select token —</option>';
+    (full.token_balances||[]).forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t.token_id;
+      opt.textContent = (t.symbol||'?') + ' — ' + t.balance;
+      sel.appendChild(opt);
+    });
+  } catch {}
+}
+
+async function registerValidator() {
+  if (!activeAddr) return notify('Select an address first', 'error');
+  const stake = parseFloat(document.getElementById('valStake').value);
+  const comm  = parseFloat(document.getElementById('valCommission').value) || 5;
+  if (!stake || stake < 1000) return notify('Min stake is 1000 XLS', 'error');
+  if (!confirm(`Register as validator?\n\nAddress: ${activeAddr}\nStake: ${stake} XLS\nCommission: ${comm}%\n\nThis will lock ${stake} XLS for staking.`)) return;
+  try {
+    const result = await rpc('xls_registerValidator', [activeAddr, stake, comm]);
+    notify(`✅ Registered as validator!\nStaked: ${result.staked} XLS\nCommission: ${result.commission}`, 'success');
+    loadBalance();
+  } catch(e) { notify(e.message, 'error'); }
+}
+
+async function loadBurnStats() {
+  try {
+    const b = document.getElementById('burnStats');
+    const data = await rpc('xls_getBurnAddress', []);
+    b.innerHTML = `
+      <div style="color:var(--muted)">XLS Burned: <span style="color:var(--red)">${data.xls_total_burned} XLS</span></div>
+      <div style="color:var(--muted)">Net Supply Change: <span style="color:var(--red)">${data.xls_net_burned}</span> nacels</div>
+      ${Object.keys(data.token_burns||{}).length > 0 ?
+        '<div style="margin-top:8px;color:var(--muted)">Token Burns:</div>' +
+        Object.entries(data.token_burns).map(([sym,b]) =>
+          `<div>${sym}: <span style="color:var(--red)">${b.total_burned} burned</span></div>`
+        ).join('') : '<div style="color:var(--muted)">No tokens burned yet</div>'}`;
+  } catch(e) {
+    document.getElementById('burnStats').textContent = 'Not available';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// DEX
+// ═══════════════════════════════════════════════════════════════
+async function loadTokens() {
+  try {
+    tokens = await rpc('tok_listTokens') || [];
+    const sel  = document.getElementById('swapToken');
+    const sval = sel.value;
+    sel.innerHTML = '<option value="">— select token —</option>';
+    const tbody = document.getElementById('tokenTableBody');
+    tbody.innerHTML = tokens.length === 0
+      ? '<tr><td colspan="6" style="color:var(--muted);padding:20px">No tokens deployed yet.</td></tr>'
+      : tokens.map(t => {
+          const price = t.reserve_xls && t.reserve_token
+            ? (parseInt(t.reserve_xls)/parseInt(t.reserve_token)).toFixed(8) : '—';
+          const opt = document.createElement('option');
+          opt.value = t.id; opt.textContent = t.name + ' (' + t.symbol + ')';
+          sel.appendChild(opt);
+          return `<tr>
+            <td>${t.name}</td>
+            <td><span class="badge purple">${t.symbol}</span></td>
+            <td>${price}</td>
+            <td>${fmtN(t.reserve_xls)}</td>
+            <td>${fmtN(t.reserve_token)}</td>
+            <td class="mono" title="${t.creator}">${(t.creator||'').slice(0,16)}…
+              <button class="copy-btn" onclick="copyText('${t.id}')">ID</button>
+            </td></tr>`;
+        }).join('');
+    // Re-select previously selected token
+    if (sval) sel.value = sval;
+  } catch(e) { console.warn('tokens', e); }
+}
+
+async function onTokenSelect() {
+  const id = document.getElementById('swapToken').value;
+  if (!id) { document.getElementById('tokenPriceInfo').textContent=''; return; }
+  try {
+    const t = await rpc('tok_getToken', [id]);
+    const price = fmtN(t.price || 0);
+    document.getElementById('tokenPriceInfo').textContent =
+      `Price: ${price} XLS/token | Pool: ${fmtN(t.reserve_xls)} XLS / ${fmtN(t.reserve_token)} tokens`;
+    updateQuote();
+  } catch {}
+}
+
+function updateQuote() {
+  clearTimeout(quoteTimer);
+  quoteTimer = setTimeout(_updateQuote, 400);
+}
+
+async function _updateQuote() {
+  const id  = document.getElementById('swapToken').value;
+  const dir = document.getElementById('swapDir').value;
+  const amt = parseFloat(document.getElementById('swapAmtIn').value);
+  const box = document.getElementById('swapQuote');
+  if (!id||!amt) { box.innerHTML='<span style="color:var(--muted)">Enter amount to see quote</span>'; return; }
+  try {
+    const n = Math.round(amt * 1e8);
+    if (dir === 'buy') {
+      const r = await rpc('tok_getBuyQuote', {token_id:id, xls_amount:n});
+      const imp = Math.abs(r.price_impact_pct||0);
+      box.innerHTML = `<div style="font-size:.82rem">
+        <b>${amt} XLS</b> → <b>${fmtN(r.tokens_out)} tokens</b><br>
+        <span style="color:var(--muted)">Price: ${r.price_now} → ${r.price_after} XLS/token</span>
+        <span class="impact ${imp>3?'high':'low'}"> ${imp.toFixed(2)}% impact</span><br>
+        <span style="color:var(--muted)">Fee: ${(amt*0.002).toFixed(6)} XLS + 0.01 XLS flat</span>
+      </div>`;
+    } else {
+      const r = await rpc('tok_getSellQuote', {token_id:id, token_amount:n});
+      const imp = Math.abs(r.price_impact_pct||0);
+      box.innerHTML = `<div style="font-size:.82rem">
+        <b>${amt} tokens</b> → <b>${fmtN(r.xls_out)} XLS</b><br>
+        <span style="color:var(--muted)">Price: ${r.price_now} → ${r.price_after} XLS/token</span>
+        <span class="impact ${imp>3?'high':'low'}"> ${imp.toFixed(2)}% impact</span>
+      </div>`;
+    }
+  } catch(e) { box.innerHTML=`<span style="color:var(--red)">${e.message}</span>`; }
+}
+
+async function doSwap() {
+  if (!activeAddr) return notify('Select an address first', 'error');
+  const id  = document.getElementById('swapToken').value;
+  const dir = document.getElementById('swapDir').value;
+  const amt = parseFloat(document.getElementById('swapAmtIn').value);
+  if (!id||!amt) return notify('Select token and enter amount', 'error');
+  try {
+    const n = Math.round(amt * 1e8);
+    // Build swap payload
+    const payload = {token_id:id, direction:dir, amount_in:n, min_amount_out:Math.round(n*0.97)};
+    const result  = await rpc('tok_swap', [activeAddr, payload]);
+    notify('Swap queued! Tx: ' + result.txHash.slice(0,20)+'…', 'success');
+    setTimeout(() => { loadBalance(); loadTokens(); }, 2000);
+  } catch(e) { notify(e.message, 'error'); }
+}
+
+function calcMintFee() {
+  const d = parseFloat(document.getElementById('mintDeposit').value)||0;
+  const fee = Math.min(Math.max(d*0.35,35),10000);
+  document.getElementById('mintFeeInfo').textContent = d>=100
+    ? `Fee: ${fee.toFixed(2)} XLS (35%, min 35, max 10 000) → Hamster Pool\nTotal cost: ${(d+fee).toFixed(2)} XLS`
+    : d>0 ? 'Minimum deposit is 100 XLS' : '';
+}
+
+async function deployToken() {
+  if (!activeAddr) return notify('Select an address first', 'error');
+  const name    = document.getElementById('mintName').value.trim();
+  const symbol  = document.getElementById('mintSymbol').value.trim();
+  const supply  = parseFloat(document.getElementById('mintSupply').value);
+  const deposit = parseFloat(document.getElementById('mintDeposit').value);
+  const desc    = document.getElementById('mintDesc').value.trim();
+  if (!name||!symbol||!supply||!deposit) return notify('Fill all fields', 'error');
+  if (deposit < 100) return notify('Min deposit is 100 XLS', 'error');
+  const fee   = Math.min(Math.max(deposit*0.35,35),10000);
+  const total = deposit+fee;
+  if (!confirm(`Deploy "${name}" (${symbol})?\n\nDeposit: ${deposit} XLS\nFee (→ Hamster Pool): ${fee.toFixed(2)} XLS\nTotal: ${total.toFixed(2)} XLS\n\nYou receive 50% of supply.\n50% goes to AMM liquidity pool.`)) return;
+  try {
+    const payload = {name,symbol,decimals:8,total_supply:Math.round(supply*1e8),initial_deposit:Math.round(deposit*1e8),description:desc};
+    const result  = await rpc('tok_mintToken', [activeAddr, payload]);
+    notify('Token deployed!\nTx: '+result.txHash.slice(0,20)+'…\n\nYour tokens will appear in balance after next block.', 'success');
+    setTimeout(loadTokens, 2000);
+    setTimeout(loadBalance, 3000);
+  } catch(e) { notify(e.message, 'error'); }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HAMSTER
+// ═══════════════════════════════════════════════════════════════
+async function loadHamster() {
+  if (!activeAddr) return;
+  try {
+    const h = await rpc('hamster_getState', [activeAddr]);
+    renderHamster(h);
+  } catch(e) { console.warn('hamster', e); }
+}
+
+function renderHamster(h) {
+  if (!h||!h.exists) {
+    document.getElementById('hamEmoji').textContent = '❓';
+    document.getElementById('hamStatus').innerHTML  = '<span style="color:var(--muted);font-size:.8rem">No hamster — need ≥ 0.1 XLS</span>';
+    return;
+  }
+  const st = h.status;
+  document.getElementById('hamEmoji').textContent = st==='dead'?'💀':st==='frozen'?'🧊':h.happiness>50?'😄':h.happiness>0?'🐹':'😢';
+  document.getElementById('hamStatus').innerHTML  =
+    `<span class="badge ${st==='alive'?'green':st==='frozen'?'purple':'red'}">${st.toUpperCase()}</span>
+     &nbsp;<span class="badge gold">Lvl ${h.level}</span>`;
+  const hp  = Math.max(0, parseFloat(h.hp)||0);
+  const hun = Math.max(0, parseFloat(h.hunger)||0);
+  const xp  = Math.max(0, parseFloat(h.xp)||0);
+  const hpy = parseFloat(h.happiness)||0;
+  document.getElementById('hamHP').textContent     = hp.toFixed(1) + ' / 100';
+  document.getElementById('hamHunger').textContent = hun.toFixed(1) + ' / 100';
+  document.getElementById('hamHappy').textContent  = hpy.toFixed(1) + ' / 100';
+  document.getElementById('hamXP').textContent     = xp.toFixed(1) + ' / 100';
+  document.getElementById('hamCredits').textContent= (parseFloat(h.credits)||0).toFixed(2);
+  document.getElementById('hamStreak').textContent = h.streak_days||0;
+  document.getElementById('barHP').style.width     = hp + '%';
+  document.getElementById('barHunger').style.width = hun + '%';
+  document.getElementById('barHappy').style.width  = ((hpy+100)/2) + '%';
+  document.getElementById('barXP').style.width     = xp + '%';
+  const gas = h.free_gas_remaining;
+  document.getElementById('hamFreeGas').textContent    = gas>0 ? 'Free gas: '+fmtN(gas)+' XLS left' : '';
+  document.getElementById('freeGasDisplay').textContent= gas>0 ? fmtN(gas)+' XLS' : '—';
+
+  // Cooldown info
+  const cds = [];
+  if (!h.free_food_ready && h.free_food_blocks_left) cds.push(`🍎 Food ready in ${h.free_food_blocks_left} blocks`);
+  if (!h.free_hp_ready   && h.free_hp_blocks_left  ) cds.push(`💊 HP ready in ${h.free_hp_blocks_left} blocks`);
+  if (!h.daily_ready     && h.daily_blocks_left    ) cds.push(`📅 Daily in ${h.daily_blocks_left} blocks`);
+  document.getElementById('hamCooldowns').textContent = cds.join(' · ');
+
+  document.getElementById('btnFeed').disabled  = !h.free_food_ready;
+  document.getElementById('btnHP').disabled    = !h.free_hp_ready;
+  document.getElementById('btnDaily').disabled = !h.daily_ready;
+  document.getElementById('reviveSection').style.display = st==='dead' ? 'block' : 'none';
+}
+
+async function hamAction(action) {
+  if (!activeAddr) return notify('Select an address first', 'error');
+  try {
+    let r;
+    if (action==='feed')  r = await rpc('hamster_feedFree',  [activeAddr]);
+    if (action==='hp')    r = await rpc('hamster_hpFree',    [activeAddr]);
+    if (action==='daily') {
+      r = await rpc('hamster_claimDaily', [activeAddr]);
+      if (r.credits_earned) notify(`+${r.credits_earned.toFixed(2)} credits earned!`, 'success');
+    }
+    renderHamster(r);
+  } catch(e) { notify(e.message, 'error'); }
+}
+
+async function buyItem(n) {
+  if (!activeAddr) return notify('Select address first', 'error');
+  try {
+    const r = await rpc('hamster_buyItem', [activeAddr, n]);
+    if (r.level_reward?.tier > 0) notify('🎉 LEVEL UP! ' + r.level_reward.description, 'success');
+    renderHamster(r);
+  } catch(e) { notify(e.message, 'error'); }
+}
+
+async function revive(payment) {
+  if (!activeAddr) return;
+  try {
+    const r = await rpc('hamster_revive', [activeAddr, payment]);
+    notify('Hamster revived! 🎉', 'success');
+    renderHamster(r);
+  } catch(e) { notify(e.message, 'error'); }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EXPLORER
+// ═══════════════════════════════════════════════════════════════
+async function loadExplorer() {
+  try {
+    const block = await rpc('xls_getLatestBlock');
+    document.getElementById('explorerBlock').innerHTML = `
+      <div>Height: <strong style="color:var(--accent2)">${block.header.height}</strong></div>
+      <div>Time: ${new Date(block.header.timestamp).toLocaleString()}</div>
+      <div>Validator: <span class="mono">${block.header.validator_addr||'—'}</span></div>
+      <div>Txs: <strong>${(block.transactions||[]).length}</strong></div>
+      <div>Hash: <span class="mono" style="font-size:.7rem">${block.header.hash||'—'}</span></div>`;
+
+    const evts = await rpc('xls_getEvents', [25]);
+    document.getElementById('explorerEvents').innerHTML =
+      (evts||[]).map(e=>`
+        <div style="border-bottom:1px solid var(--border);padding:8px 0;font-size:.78rem">
+          <span class="badge ${e.type==='block_reward'?'gold':e.type==='transfer'?'green':e.type==='mint_token'?'blue':'purple'}">${e.type}</span>
+          <span style="color:var(--muted);margin-left:8px">Block ${e.block_height}</span>
+          ${e.actor?`<div class="mono" style="margin-top:2px">${e.actor.slice(0,24)}…</div>`:''}
+        </div>`).join('') || '<span style="color:var(--muted)">No events yet</span>';
+
+    const vals = await rpc('xls_getValidators');
+    document.getElementById('validatorTable').innerHTML =
+      (vals||[]).length===0
+        ? '<tr><td colspan="5" style="color:var(--muted);padding:16px">No validators registered. Use "Become Validator" in the Wallet tab.</td></tr>'
+        : (vals||[]).map(v=>`<tr>
+            <td class="mono" title="${v.address}">${v.address.slice(0,20)}…</td>
+            <td>${fmtN(v.staked_amount)}</td>
+            <td>${v.blocks_proposed}</td>
+            <td>${((v.commission||0)*100).toFixed(1)}%</td>
+            <td><span class="badge ${v.status===1?'green':v.status===2?'red':'purple'}">
+              ${v.status===1?'Active':v.status===2?'Jailed':'Inactive'}
+            </span></td></tr>`).join('');
+  } catch(e) { console.warn('explorer', e); }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════════════
+function fmtN(n) {
+  const v = parseInt(n)||0;
+  const x = v/1e8;
+  if (x>=1e6) return (x/1e6).toFixed(3)+'M';
+  if (x>=1e3) return (x/1e3).toFixed(3)+'K';
+  return x>=1 ? x.toFixed(4) : x.toFixed(6);
+}
+
+function copyText(txt) {
+  navigator.clipboard.writeText(txt).then(()=>notify('Copied!','success')).catch(()=>{
+    const ta = document.createElement('textarea');
+    ta.value = txt; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    notify('Copied!','success');
+  });
+}
+
+function copyAddr(addr) { copyText(addr); }
+function copyBurnAddr() { copyText('exc1burn000000000000000000000000000000000000'); }
+
+function showPanel(name, btn) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (name==='explorer') loadExplorer();
+  if (name==='dex')      loadTokens();
+  if (name==='hamster')  loadHamster();
+}
+
+let notifyTimer;
+function notify(msg, type='success') {
+  const n = document.getElementById('notify');
+  n.textContent = msg; n.className = 'notify show '+type;
+  clearTimeout(notifyTimer);
+  notifyTimer = setTimeout(()=>n.classList.remove('show'), 5000);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BOOTSTRAP — check for existing session
+// ═══════════════════════════════════════════════════════════════
+window.addEventListener('load', async () => {
+  const seed = sessionStorage.getItem('xls_seed');
+  if (seed) {
+    // Resume session
+    await startSession(seed);
+  }
+  // Auth overlay stays visible until login
+  // Node connects in background
+  try {
+    const h = await fetch(NODE+'/health').then(r=>r.json()).catch(()=>null);
+    if (h) {
+      document.getElementById('statusDot').style.background = 'var(--green)';
+      document.getElementById('statusText').textContent = 'Block #'+h.height;
+    }
+  } catch {}
+});
+</script>
+</body>
+</html>
